@@ -1,0 +1,37 @@
+##########################################################################################
+#                                                                                        #
+#                                      CLIENT NOTES                                      #
+#                                                                                        #
+##########################################################################################
+
+---------------------------------------- TCP CLIENT --------------------------------------
+1. Create a socket object with 'AF_INET' and 'SOCK_STREAM' parameters.
+2. Connect client to the server.
+3. Send data in bytes.
+4. Receive some data (response) back and close the socket.
+
+NOTE: TCP is conection-based protocol thus it needs to connect and establish connection
+before sending or receiving any data.
+
+---------------------------------------- UDP CLIENT --------------------------------------
+1. Create a socket object with 'AF_INET' and 'SOCK_DGRAM' parameters.
+2. Call 'sendto()' method passing in the data and the target server.
+3. Call 'recvfrom()' method to receive UDP data back. (It will return both the data and the details of the remote host and port)
+4. Close the socket.
+
+NOTE: UDP is conectionless protocol thus it doesn't need to establish connection before
+sending or receiving any data. That's why UDP is less reliable than TCP.
+
+
+##########################################################################################
+#                                                                                        #
+#                                      SERVER NOTES                                      #
+#                                                                                        #
+##########################################################################################
+
+---------------------------------------- TCP SERVER --------------------------------------
+1. Create variables: 'IP' and 'PORT' for server to listen on and 'bind()' it with passed parameters.
+2. Initialise listening on server 'listen()' with bandwidth parameter.
+3. Accept connection from client and recieve 'client' and 'address' variables from it.
+4. Create new thread object that points our server to handle incoming another connection in loop.
+5. Create 'handle_client()' function that performs the 'recv()' and then sends a simple message back to client.
