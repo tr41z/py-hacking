@@ -75,19 +75,19 @@ class NetCat:
             
         elif self.args.command:
             cmd_buffer = b''
+            client_socket.send(b'BHP: #> ')
             while True:
                 try:
-                    client_socket.send(b'BHP: #> ')
-                    while True:
-                        data = client_socket.recv(64)
-                        if b'\n' in data:
-                            cmd_buffer += data
-                            break
+                    data = client_socket.recv(64)
+                    if b'\n' in data:
                         cmd_buffer += data
-                    response = execute(cmd_buffer.decode())
-                    if response:
-                        client_socket.send(response.encode())
-                    cmd_buffer = b''
+                        response = execute(cmd_buffer.decode())
+                        if response:
+                            client_socket.send(response.encode())
+                        cmd_buffer = b''
+                        client_socket.send(b'BHP: #> ')
+                    else:
+                        cmd_buffer += data
                 except Exception as e:
                     print(f'server killed {e}')
                     self.socket.close()
