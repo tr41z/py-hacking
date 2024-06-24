@@ -91,10 +91,13 @@ class NetCat:
 def execute(cmd):
     cmd = cmd.strip()
     if not cmd:
-        return
-    output = subprocess.check_output(shlex.split(cmd),
-                                     stderr=subprocess.STDOUT)
-    return output.decode()
+        return ''
+    try:
+        print(f"Executing system command: {cmd}")  # Debugging statement
+        output = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
+        return output.decode()
+    except subprocess.CalledProcessError as e:
+        return e.output.decode()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
