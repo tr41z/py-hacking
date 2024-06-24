@@ -35,7 +35,7 @@ class NetCat:
                     if recv_len < 4096:
                         break
                 if response:
-                    print(response, end='')
+                    print(response)
                     buffer = input('> ')
                     buffer += '\n'
                     self.socket.send(buffer.encode())
@@ -75,20 +75,15 @@ class NetCat:
             
         elif self.args.command:
             cmd_buffer = b''
-            client_socket.send(b'BHP: #> ')
             while True:
                 try:
-                    while True:
-                        data = client_socket.recv(64)
-                        if b'\n' in data:
-                            cmd_buffer += data
-                            break
-                        cmd_buffer += data
+                    client_socket.send(b'BHP: #> ')
+                    while '\n' not in cmd_buffer.decode():
+                        cmd_buffer += client_socket.recv(64)
                     response = execute(cmd_buffer.decode())
                     if response:
                         client_socket.send(response.encode())
                     cmd_buffer = b''
-                    client_socket.send(b'BHP: #> ')
                 except Exception as e:
                     print(f'server killed {e}')
                     self.socket.close()
@@ -98,12 +93,9 @@ def execute(cmd):
     cmd = cmd.strip()
     if not cmd:
         return
-    try:
-        output = subprocess.check_output(shlex.split(cmd),
-                                         stderr=subprocess.STDOUT)
-        return output.decode()
-    except subprocess.CalledProcessError as e:
-        return f'Failed to execute command: {e}'
+    output = subprocess.check_output(shlex.split(cmd),
+                                     stderr=subprocess.STDOUT)
+    return output.decode()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
