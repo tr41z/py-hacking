@@ -78,8 +78,12 @@ class NetCat:
             while True:
                 try:
                     client_socket.send(b'BHP: #> ')
-                    while '\n' not in cmd_buffer.decode():
-                        cmd_buffer += client_socket.recv(64)
+                    while True:
+                        data = client_socket.recv(64)
+                        if b'\n' in data:
+                            cmd_buffer += data
+                            break
+                        cmd_buffer += data
                     response = execute(cmd_buffer.decode())
                     if response:
                         client_socket.send(response.encode())
@@ -93,9 +97,12 @@ def execute(cmd):
     cmd = cmd.strip()
     if not cmd:
         return
-    output = subprocess.check_output(shlex.split(cmd),
-                                     stderr=subprocess.STDOUT)
-    return output.decode()
+    try:
+        output = subprocess.check_output(shlex.split(cmd),
+                                         stderr=subprocess.STDOUT)
+        return output.decode()
+    except subprocess.CalledProcessError as e:
+        return f'Failed to execute command: {e}'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
