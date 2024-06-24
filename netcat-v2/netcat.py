@@ -35,10 +35,10 @@ class NetCat:
                     if recv_len < 4096:
                         break
                 if response:
-                    print(response)
-                    buffer = input('> ')
-                    buffer += '\n'
-                    self.socket.send(buffer.encode())
+                    print(response, end='')
+                buffer = input('> ')
+                buffer += '\n'
+                self.socket.send(buffer.encode())
         except KeyboardInterrupt:
             print('User terminated program.')
             self.socket.close()
@@ -115,10 +115,6 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--target', default='192.168.68.1', help='specified IP')
     parser.add_argument('-u', '--upload', help='upload file')
     args = parser.parse_args()
-    if args.listen:
-        buffer = ''
-    else:
-        buffer = sys.stdin.read()
-        
-    nc = NetCat(args, buffer.encode())
+    
+    nc = NetCat(args)
     nc.run()
