@@ -35,7 +35,7 @@ class NetCat:
                     if recv_len < 4096:
                         break
                 if response:
-                    print(response)
+                    print(response, end='')
                     buffer = input('> ')
                     buffer += '\n'
                     self.socket.send(buffer.encode())
@@ -78,16 +78,17 @@ class NetCat:
             client_socket.send(b'BHP: #> ')
             while True:
                 try:
-                    data = client_socket.recv(64)
-                    if b'\n' in data:
+                    while True:
+                        data = client_socket.recv(64)
+                        if b'\n' in data:
+                            cmd_buffer += data
+                            break
                         cmd_buffer += data
-                        response = execute(cmd_buffer.decode())
-                        if response:
-                            client_socket.send(response.encode())
-                        cmd_buffer = b''
-                        client_socket.send(b'BHP: #> ')
-                    else:
-                        cmd_buffer += data
+                    response = execute(cmd_buffer.decode())
+                    if response:
+                        client_socket.send(response.encode())
+                    cmd_buffer = b''
+                    client_socket.send(b'BHP: #> ')
                 except Exception as e:
                     print(f'server killed {e}')
                     self.socket.close()
