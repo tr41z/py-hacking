@@ -74,15 +74,16 @@ class NetCat:
             client_socket.send(message.encode())
             
         elif self.args.command:
+            cmd_buffer = b''
             while True:
                 try:
                     client_socket.send(b'BHP: #> ')
-                    cmd_buffer = b''
-                    while b'\n' not in cmd_buffer:
+                    while '\n' not in cmd_buffer.decode():
                         cmd_buffer += client_socket.recv(64)
-                    response = execute(cmd_buffer.decode().strip())
+                    response = execute(cmd_buffer.decode())
                     if response:
                         client_socket.send(response.encode())
+                    cmd_buffer = b''
                 except Exception as e:
                     print(f'server killed {e}')
                     self.socket.close()
@@ -91,13 +92,10 @@ class NetCat:
 def execute(cmd):
     cmd = cmd.strip()
     if not cmd:
-        return ''
-    try:
-        print(f"Executing system command: {cmd}")  # Debugging statement
-        output = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
-        return output.decode()
-    except subprocess.CalledProcessError as e:
-        return e.output.decode()
+        return
+    output = subprocess.check_output(shlex.split(cmd),
+                                     stderr=subprocess.STDOUT)
+    return output.decode()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
